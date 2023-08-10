@@ -1,3 +1,4 @@
+import java.lang.Character.getType
 
 println("Welcome to the Scala worksheet")
 
@@ -6,3 +7,9 @@ println("Welcome to the Scala worksheet")
 if(20 > 10) "left" else "right"
 
 println("The ultimate answer is" + 42)
+
+"hello".toUpperCase
+
+2
+
+getType(2)
