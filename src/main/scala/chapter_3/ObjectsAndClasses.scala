@@ -1,5 +1,7 @@
 package chapter_3
 
+import chapter_3.ObjectsAndClasses.Director
+
 object ObjectsAndClasses extends App {
   def badness = throw new Exception("Bad")
   def otherbadness = null
@@ -48,6 +50,7 @@ object ObjectsAndClasses extends App {
     }
   }
 
+
   class Film(
       val name: String,
       val yearOfRelease: Int,
@@ -76,13 +79,13 @@ object ObjectsAndClasses extends App {
     }
 
     def highestRating(filmOne: Film, filmTwo: Film): Film = {
-      if (filmOne.imdbRating > filmTwo) filmOne
+      if (filmOne.imdbRating > filmTwo.imdbRating) filmOne
       else filmTwo
     }
 
-    def oldestDirectorAtTheTime(filmOne: Film, filmTwo: Film): Film = {
-      if (filmOne.directorsAge > filmTwo.directorsAge) filmOne
-      else filmTwo
+    def oldestDirectorAtTheTime(filmOne: Film, filmTwo: Film): Director = {
+      if (filmOne.directorsAge > filmTwo.directorsAge) filmOne.director
+      else filmTwo.director
     }
   }
 
@@ -149,5 +152,46 @@ object ObjectsAndClasses extends App {
   val johnDoe = Person("John Doe")
   println(johnDoe.firstName)
   println(johnDoe.lastName)
+
+  case class CatTwo(colour: String, food: String)
+
+  object ChipShopTwo {
+    def willServe(cat: CatTwo): Boolean = {
+      cat.food.toLowerCase match {
+        case "chips" => true
+        case _ => false
+      }
+    }
+  }
+
+  println(ChipShopTwo.willServe(CatTwo("black", "CHIPS")))
+  println(ChipShopTwo.willServe(CatTwo("red", "pie")))
+
+  case class PersonTwo(firstName: String, lastName: String)
+
+  object PersonTwo {
+    def apply(fullName: String): PersonTwo = {
+      val names = fullName.split(" ")
+      new PersonTwo(names.head, names.last)
+    }
+  }
+
+  val persontwo = PersonTwo("Jane Doe")
+  println(persontwo)
+
+  val personthree = PersonTwo("Kim", "Morgan")
+  println(personthree)
+
+  object Stormtrooper {
+    def inspect(person: PersonTwo): String =
+      person match {
+        case PersonTwo("Luke", "Skywalker") => "Stop, rebel scum!"
+        case PersonTwo("Han", "Solo")       => "Stop, rebel scum!"
+        case PersonTwo(first, last)         => s"Move along, $first"
+      }
+  }
+
+  println(Stormtrooper.inspect(PersonTwo("Noel", "Welsh")))
+  Stormtrooper.inspect(PersonTwo("Han", "Solo"))
 
 }
