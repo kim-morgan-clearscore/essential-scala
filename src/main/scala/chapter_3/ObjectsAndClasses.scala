@@ -3,11 +3,10 @@ package chapter_3
 object ObjectsAndClasses extends App {
   def badness = throw new Exception("Bad")
   def otherbadness = null
-  val bar = if(true) 123 else badness
-  val baz = if(false) "it worked" else otherbadness
+  val bar = if (true) 123 else badness
+  val baz = if (false) "it worked" else otherbadness
 
-  class Cat(val name: String, val colour: String, val food: String) {
-  }
+  class Cat(val name: String, val colour: String, val food: String) {}
 
   val oswald = new Cat("Oswald", "Black", "Milk")
   val henderson = new Cat("Henderson", "Ginger", "Chips")
@@ -26,18 +25,65 @@ object ObjectsAndClasses extends App {
   assert(ChipShop.willServe(oswald) == false)
   assert(ChipShop.willServe(henderson) == true)
 
-  class Director(val firstName: String, val lastName: String, val yearOfBirth: Int) {
+  class Director(
+      val firstName: String,
+      val lastName: String,
+      val yearOfBirth: Int
+  ) {
     def name = s"${firstName} ${lastName}"
   }
 
-  class Film(val name: String, val yearOfRelease: Int, val imdbRating: Double, val director: Director) {
+  object Director {
+    def apply(
+        firstName: String,
+        lastName: String,
+        yearOfBirth: Int
+    ): Director = {
+      new Director(firstName, lastName, yearOfBirth)
+    }
+
+    def older(directorOne: Director, directorTwo: Director): Director = {
+      if (directorOne.yearOfBirth < directorTwo.yearOfBirth) directorOne
+      else directorTwo
+    }
+  }
+
+  class Film(
+      val name: String,
+      val yearOfRelease: Int,
+      val imdbRating: Double,
+      val director: Director
+  ) {
     def directorsAge = yearOfRelease - director.yearOfBirth
     def isDirectedBy(director: Director) = director == this.director
-    def copy(name: String = this.name,
-             yearOfRelease: Int = this.yearOfRelease,
-             imdbRating: Double = this.imdbRating,
-             director: Director = this.director) =
+    def copy(
+        name: String = this.name,
+        yearOfRelease: Int = this.yearOfRelease,
+        imdbRating: Double = this.imdbRating,
+        director: Director = this.director
+    ) =
       new Film(name, yearOfRelease, imdbRating, director)
+  }
+
+  object Film {
+    def apply(
+        name: String,
+        yearOfRelease: Int,
+        imdbRating: Double,
+        director: Director
+    ): Film = {
+      new Film(name, yearOfRelease, imdbRating, director)
+    }
+
+    def highestRating(filmOne: Film, filmTwo: Film): Film = {
+      if (filmOne.imdbRating > filmTwo) filmOne
+      else filmTwo
+    }
+
+    def oldestDirectorAtTheTime(filmOne: Film, filmTwo: Film): Film = {
+      if (filmOne.directorsAge > filmTwo.directorsAge) filmOne
+      else filmTwo
+    }
   }
 
   val eastwood = new Director("Clint", "Eastwood", 1930)
@@ -54,14 +100,17 @@ object ObjectsAndClasses extends App {
   val invictus = new Film("Invictus", 2009, 7.4, eastwood)
   val predator = new Film("Predator", 1987, 7.9, mcTiernan)
   val dieHard = new Film("Die Hard", 1988, 8.3, mcTiernan)
-  val huntForRedOctober = new Film("The Hunt for Red October", 1990, 7.6, mcTiernan)
-  val thomasCrownAffair = new Film("The Thomas Crown Affair", 1999, 6.8, mcTiernan)
+  val huntForRedOctober =
+    new Film("The Hunt for Red October", 1990, 7.6, mcTiernan)
+  val thomasCrownAffair =
+    new Film("The Thomas Crown Affair", 1999, 6.8, mcTiernan)
 
   assert(eastwood.yearOfBirth == 1930)
   assert(dieHard.director.name == "John McTiernan")
   assert(invictus.isDirectedBy(nolan) == false)
 
   class Adder(amount: Int) {
+    def apply(in: Int): Int = in + amount
     def add(in: Int) = in + amount
   }
 
@@ -77,6 +126,28 @@ object ObjectsAndClasses extends App {
 
   println(new Counter(10).inc.dec.inc.inc.count)
 
-  // Up to Object as Functions
+  val add3 = new Adder(3)
+  assert(add3.apply(2) == 5)
+  assert(add3(4) == 7)
+
+  class Timestamp(val seconds: Long)
+
+  object Timestamp {
+    def apply(hours: Int, minutes: Int, seconds: Int): Timestamp =
+      new Timestamp(hours * 60 * 60 + minutes * 60 + seconds)
+  }
+
+  class Person(val firstName: String, val lastName: String)
+
+  object Person {
+    def apply(fullName: String): Person = {
+      val names = fullName.split(" ")
+      new Person(names.head, names.last)
+    }
+  }
+
+  val johnDoe = Person("John Doe")
+  println(johnDoe.firstName)
+  println(johnDoe.lastName)
 
 }
