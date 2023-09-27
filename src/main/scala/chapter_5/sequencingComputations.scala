@@ -90,16 +90,28 @@ object sequencingComputations extends App {
   val pair = Pair2[String, Int]("hi", 2)
   println(pair.one)
 
-  sealed trait Sum[A, B] {
+  sealed trait Sum[+A, +B] {
     def fold[C](left: A => C, right: B => C): Unit = {
       this match {
-        case Left(value)  => left(value)
-        case Right(value) => right(value)
+        case Fail(value)    => left(value)
+        case Succeed(value) => right(value)
       }
     }
+
+    def map[C](f: B => C): Sum[A, C] =
+      this match {
+        case Fail(value)    => Fail(value)
+        case Succeed(value) => Succeed(f(value))
+      }
+
+    def flatMap[C](f: B => Sum[A, C]): Sum[A, C] =
+      this match {
+        case Fail(value)    => Fail(value)
+        case Succeed(value) => f(value)
+      }
   }
-  final case class Left[A, B](value: A) extends Sum[A, B]
-  final case class Right[A, B](value: B) extends Sum[A, B]
+  final case class Fail[A](value: A) extends Sum[A, Nothing]
+  final case class Succeed[B](value: B) extends Sum[Nothing, B]
 
   sealed trait Maybe[A] {
     def fold[B](empty: B, full: A => B): B
@@ -127,4 +139,15 @@ object sequencingComputations extends App {
 
   println(example.map(x => (x * 2)).map(y => y + 1).map(z => z / 3))
 
+  val list = List(1, 2, 3)
+  val flatmappedList = list.flatMap(num => List(num, num * -1))
+  println(flatmappedList)
+
+  val maybeList: List[Maybe[Int]] = List(Full(3), Full(2), Full(1))
+  val mappedMaybeList =
+    maybeList.map(maybe =>
+      maybe.flatMap[Int](x => if (x % 2 == 0) Full(x) else Empty())
+    )
+
+  println(mappedMaybeList)
 }
